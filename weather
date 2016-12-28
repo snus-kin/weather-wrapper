@@ -39,7 +39,7 @@ while true; do
 done
 
 if  [[ $three = true ]]; then
-    curl -s https://wttr.in/$location 2> /dev/null 
+    curl -s http://wttr.in/$location 2> /dev/null
 else
     curl -s http://wttr.in/$location 2> /dev/null | head -7
 fi
