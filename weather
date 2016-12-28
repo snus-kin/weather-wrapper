@@ -1,0 +1,11 @@
+#!/bin/bash
+fallback="London"
+command="curl -s http://wttr.in/"
+
+if [ $# -eq 1 ]; then
+    city=$1
+else
+    city=$fallback
+fi
+
+$command$city 2> /dev/null | head -7
