@@ -1,4 +1,45 @@
 #!/bin/bash
-command="curl -s http://wttr.in/"
-city=$1
-$command$city 2> /dev/null | head -7
+#check if getopt works
+getopt --test > /dev/null
+if [[ $? -ne 4 ]]; then
+    echo "getopt does not work in this environment"
+    exit 1
+fi
+
+#create options for getopt
+SHORT=3c:
+LONG=3-day,city:
+PARSED=`getopt --options $SHORT --longoptions $LONG --name "$0" -- "$@"`
+
+if [[ $? -ne 0 ]]; then
+    exit 2
+fi
+
+eval set -- "$PARSED"
+
+while true; do
+    case "$1" in
+        -c|--city)
+            location="$2"
+            shift 2
+            ;;
+        -3|--3day)
+            three=true
+            shift
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            echo "Error"
+            exit 3
+            ;;
+    esac
+done
+
+if  [[ $three = true ]]; then
+    curl -s https://wttr.in/$location 2> /dev/null 
+else
+    curl -s http://wttr.in/$location 2> /dev/null | head -7
+fi
