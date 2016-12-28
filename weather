@@ -1,3 +1,4 @@
 #!/bin/bash
 command="curl -s http://wttr.in/"
+city=$1
 $command$city 2> /dev/null | head -7
