@@ -2,5 +2,5 @@
 A bash wrapper for wttr.in
 
 # Usage
-`weather <city>`
+`weather <city>`  
 Fallback is by default London
