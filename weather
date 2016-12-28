@@ -6,9 +6,16 @@ if [[ $? -ne 4 ]]; then
     exit 1
 fi
 
+function help_message {
+    echo "This is a wrapper for wttr.in"
+    echo "-3, --3-day: Get the full, 3-day forecast"
+    echo "-c, --city: Specify the city, wttr.in will predict otherwise"
+    echo "Without any options, it will return a 1 day forecase with location prediction"
+}
+
 #create options for getopt
-SHORT=3c:
-LONG=3-day,city:
+SHORT=3c:h
+LONG=3-day,city:,help
 PARSED=`getopt --options $SHORT --longoptions $LONG --name "$0" -- "$@"`
 
 if [[ $? -ne 0 ]]; then
@@ -19,11 +26,15 @@ eval set -- "$PARSED"
 
 while true; do
     case "$1" in
+        -h|--help)
+            help_message
+            exit 4
+            ;;
         -c|--city)
             location="$2"
             shift 2
             ;;
-        -3|--3day)
+        -3|--3-day)
             three=true
             shift
             ;;
