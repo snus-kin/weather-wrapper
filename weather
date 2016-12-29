@@ -15,8 +15,8 @@ function help_message {
 }
 
 #create options for getopt
-SHORT=:3c:hm:
-LONG=:3-day,city:,help,moon:
+SHORT=3c:hm
+LONG=3-day,city:,help,moon
 PARSED=`getopt --options $SHORT --longoptions $LONG --name "$0" -- "$@"`
 
 if [[ $? -ne 0 ]]; then
