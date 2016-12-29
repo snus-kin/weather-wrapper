@@ -55,6 +55,11 @@ while true; do
     esac
 done
 
+if [[ $three && $moon = true ]]; then
+    echo "Please only use one view option"
+    exit 4
+fi
+
 if  [[ $three = true ]]; then
     curl -s http://wttr.in/$location 2> /dev/null | head -n -2
 elif [[ $moon = true ]]; then
