@@ -66,4 +66,5 @@ elif [[ $moon = true ]]; then
     curl -s http://wttr.in/moon 2> /dev/null | head -n -4
 else
     curl -s http://wttr.in/$location 2> /dev/null | head -7
+    echo ""
 fi
