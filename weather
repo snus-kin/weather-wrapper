@@ -1,74 +1,83 @@
-#!/bin/bash
-#check if getopt works
-getopt --test > /dev/null
-if [[ $? -ne 4 ]]; then
-    echo "getopt does not work in this environment"
-    exit 1
-fi
+#!/usr/bin/env bash
 
-function help_message {
-    echo "This is a wrapper for wttr.in"
-    echo "-3, --3-day: Get the full, 3-day forecast"
-    echo "-c, --city: Specify the city, wttr.in will predict otherwise"
-    echo "-m, --moon: Show the moon phase"
-    echo "Without any options, it will return a 1 day forecase with location prediction"
+function syntax_error {
+  echo "Syntax error. Use -h or --help for options"
+  exit 2
 }
 
-#create options for getopt
-SHORT=3c:hm
-LONG=3-day,city:,help,moon
-PARSED=`getopt --options $SHORT --longoptions $LONG --name "$0" -- "$@"`
+function help_message {
+  echo "A bash wrapper for wttr.in."
+  echo "Displays weather forecast for a location, or the current phase of the moon."
+  echo "Options:"
+  echo "  -3, --3day:      Get the full, 3-day forecast"
+  echo "  -c, --city CITY: Specify the location city as CITY, e.g. -c Berlin"
+  echo "  -m, --moon:      Show the moon phase (location agnostic)"
+  echo "Without any options, it will return a 1 day forecast for your current location"
+  exit 4
+}
 
-if [[ $? -ne 0 ]]; then
-    exit 2
-fi
+OPTSPEC=":hmc3-:"
 
-eval set -- "$PARSED"
-
-while true; do
-    case "$1" in
-        -h|--help)
-            help_message
-            exit 4
-            ;;
-        -m|--moon)
-            moon=true
-            shift
-            break
-            ;;
-        -c|--city)
-            nodisplaylocation=true
-            location="$2"
-            shift 2
-            ;;
-        -3|--3-day)
-            three=true
-            shift
-            ;;
-        --)
-            shift
-            break
-            ;;
+while getopts "$OPTSPEC" optchar; do
+  case "${optchar}" in
+    -)
+      case "${OPTARG}" in
+        help)
+          help_message
+          ;;
+        moon)
+          moon=true
+          ;;
+        3day)
+          three=true
+          ;;
+        city)
+          nodisplaylocation=true
+          city="${!OPTIND}"
+          OPTIND="$(( OPTIND + 1 ))"
+          ;;
         *)
-            echo "Error"
-            exit 3
-            ;;
-    esac
+          syntax_error
+          ;;
+      esac
+      ;;
+    h)
+      help_message
+      ;;
+    m)
+      moon=true
+      ;;
+    3)
+      three=true
+      ;;
+    c)
+      nodisplaylocation=true
+      city="${!OPTIND}"
+      OPTIND="$(( OPTIND + 1 ))"
+      ;;
+    *)
+      syntax_error
+      ;;
+  esac
 done
 
 if [[ $three && $moon = true ]]; then
-    echo "Please only use one view option"
+    echo "The 3-day and moon phase views are mutually exclusive; please choose one or the other"
     exit 4
 fi
 
+# In awk processes below, xt and xh are lines to exclude from the head and tail of curl output, respectively
+# Should be slightly more portable than using head and tail
+# To extract tail, awk builds a buffer and begins printing it only after NR>xt e.g. a[1] is printed when a[xt] is being recorded
+
 if  [[ $three = true ]]; then
-    curl -s http://wttr.in/$location 2> /dev/null | head -n -2
+  curl -s http://wttr.in/$city 2> /dev/null | awk -v xt=2 '{if(NR>xt) print a[NR%xt]; a[NR%xt]=$0}'
 elif [[ $moon = true ]]; then
-    curl -s http://wttr.in/moon 2> /dev/null | head -n -4
+  curl -s http://wttr.in/moon 2> /dev/null | awk -v xt=4 '{if(NR>xt) print a[NR%xt]; a[NR%xt]=$0}'
 elif [[ $nodisplaylocation = true ]]; then
-    curl -s http://wttr.in/$location 2> /dev/null | head -7 | tail -6
-    echo ""
+  curl -s http://wttr.in/$city 2> /dev/null | awk -v xt=33 '{if(NR>xt) print a[NR%xt]; a[NR%xt]=$0}' | awk -v xh=1 'NR>xh{print $0}'
+  echo ""
 else
-    curl -s http://wttr.in/ 2> /dev/null | head -7 
-    echo ""
+  curl -s http://wttr.in/ 2> /dev/null | awk -v xt=33 '{if(NR>xt) print a[NR%xt]; a[NR%xt]=$0}'
+  echo ""
 fi
