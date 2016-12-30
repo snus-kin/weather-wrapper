@@ -1,10 +1,10 @@
 # weather-wrapper
-A bash wrapper for wttr.in
+A bash wrapper for wttr.in.
 
 # Usage
-`./weather (-c, -h, -3) (--city, --help, --3-day)`  
--c, --city: specifies city to be given to wttr.in, without wittr.in predicts  
--h, --help: display help text  
--3, --3-day: display full 3-day forecast  
--m, --moon: display the moon forecast for the current day  
-Running just `./weather` will give a predicted location, current forecast (the output of curl wttr.in | head -7)
+Displays weather forecast for a location, or the current phase of the moon.
+Options:
+  -3, --3day:      Get the full, 3-day forecast
+  -c, --city CITY: Specify the location city as CITY, e.g. -c Berlin
+  -m, --moon:      Show the moon phase (location agnostic)
+Without any options, it will return a 1 day forecast for your current location
