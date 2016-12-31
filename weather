@@ -104,10 +104,10 @@ if  [[ $three = true ]]; then
   fmt_wttr 0 2
 elif [[ $today || $tomorrow || $nextday = true ]]; then
   if [[ $today = true ]]; then
-    fmt_wttr 7 27 
+    fmt_wttr 7 23 
   fi
   if [[ $tomorrow = true ]]; then
-    fmt_wttr 17 17
+    fmt_wttr 17 13
   fi
   if [[ $nextday = true ]]; then
     fmt_wttr 27 3
@@ -118,6 +118,6 @@ elif [[ $nodisplaylocation = true ]]; then
   fmt_wttr 1 33
   echo ""
 else
-  curl -s http://wttr.in/ 2> /dev/null | awk -v xt=37 '{if(NR>xt) print a[NR%xt]; a[NR%xt]=$0}'
+  curl -s http://wttr.in/ 2> /dev/null | awk -v xt=33 '{if(NR>xt) print a[NR%xt]; a[NR%xt]=$0}'
   echo ""
 fi
