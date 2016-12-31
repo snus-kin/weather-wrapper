@@ -2,14 +2,18 @@
 A bash wrapper for wttr.in.
 
 # Usage
-Displays weather forecast for a location, or the current phase of the moon.  
-Options:  
-  -3, --3day:      Get the full, 3-day forecast  
-  -c, --city CITY: Specify the location city as CITY, e.g. -c Berlin  
-  -m, --moon:      Show the moon phase (location agnostic)  
-Without any options, it will return a 1 day forecast for your current location
+A bash wrapper for wttr.in.
+Displays weather forecast for a location, or the current phase of the moon.
+Options:
+  -0, --today:     Display today's quadripartite weather forecast
+  -1, --tomorrow:  Display tomorrow's
+  -2, --nextday:   Display the next day's
+  -3, --three:     Three-day quad
+  -c, --city CITY: Specify the location city as CITY, e.g. -c Berlin
+  -m, --moon:      Show the moon phase (location agnostic)
+Without any options, display today's simple forecast for your default location
 
 # TODO
-- [ ] Add some way of making a 'default' city that isn't guessed by wttr.in  
-- [ ] Add more specific commands (-t for tomorrow?)
-  
+- [ ] read defaults from config file including default city
+- [ ] make only one curl request when combining -0, -1, -2
+- [ ] weather and moon should probably be permitted together, outputs concatenated
