@@ -9,14 +9,17 @@ function help_message {
   echo "A bash wrapper for wttr.in."
   echo "Displays weather forecast for a location, or the current phase of the moon."
   echo "Options:"
-  echo "  -3, --3day:      Get the full, 3-day forecast"
+  echo "  -0, --today:     Display today's quadripartite weather forecast"
+  echo "  -1, --tomorrow:  Display tomorrow's"
+  echo "  -2, --nextday:   Display the next day's"
+  echo "  -3, --three:     Three-day quad"
   echo "  -c, --city CITY: Specify the location city as CITY, e.g. -c Berlin"
   echo "  -m, --moon:      Show the moon phase (location agnostic)"
-  echo "Without any options, it will return a 1 day forecast for your current location"
+  echo "Without any options, display today's simple forecast for your default location"
   exit 4
 }
 
-OPTSPEC=":hmc3-:"
+OPTSPEC=":hmc0123-:"
 
 while getopts "$OPTSPEC" optchar; do
   case "${optchar}" in
@@ -28,7 +31,16 @@ while getopts "$OPTSPEC" optchar; do
         moon)
           moon=true
           ;;
-        3day)
+        today)
+          today=true
+          ;;
+        tomorrow)
+          tomorrow=true
+          ;;
+        nextday)
+          nextday=true
+          ;;
+        three)
           three=true
           ;;
         city)
@@ -47,6 +59,15 @@ while getopts "$OPTSPEC" optchar; do
     m)
       moon=true
       ;;
+    0)
+      today=true
+      ;;
+    1)
+      tomorrow=true
+      ;;
+    2)
+      nextday=true
+      ;;
     3)
       three=true
       ;;
@@ -61,8 +82,8 @@ while getopts "$OPTSPEC" optchar; do
   esac
 done
 
-if [[ $three && $moon = true ]]; then
-    echo "The 3-day and moon phase views are mutually exclusive; please choose one or the other"
+if [[ ( $today || $tomorrow || $nextday || $three = true ) && $moon = true ]]; then
+    echo "The weather and moon phase views are mutually exclusive; please choose one or the other"
     exit 4
 fi
 
@@ -70,12 +91,31 @@ fi
 # Should be slightly more portable than using head and tail
 # To extract tail, awk builds a buffer and begins printing it only after NR>xt e.g. a[1] is printed when a[xt] is being recorded
 
-if  [[ $three = true ]]; then
-  curl -s http://wttr.in/$city 2> /dev/null | awk -v xt=2 '{if(NR>xt) print a[NR%xt]; a[NR%xt]=$0}'
-elif [[ $moon = true ]]; then
+function fmt_wttr {
+  # $1=xh, $2=xt e.g. to exclude 3 lines from head and 5 from tail: fmt_wttr 3 5
+  curl -s http://wttr.in/$city 2> /dev/null | awk -v xt=$2 '{if(NR>xt) print a[NR%xt]; a[NR%xt]=$0}' | awk -v xh=$1 'NR>xh{print $0}'
+}
+
+function fmt_moon {
   curl -s http://wttr.in/moon 2> /dev/null | awk -v xt=4 '{if(NR>xt) print a[NR%xt]; a[NR%xt]=$0}'
+}
+
+if  [[ $three = true ]]; then
+  fmt_wttr 0 2
+elif [[ $today || $tomorrow || $nextday = true ]]; then
+  if [[ $today = true ]]; then
+    fmt_wttr 7 23
+  fi
+  if [[ $tomorrow = true ]]; then
+    fmt_wttr 17 13
+  fi
+  if [[ $nextday = true ]]; then
+    fmt_wttr 27 3
+  fi
+elif [[ $moon = true ]]; then
+  fmt_moon
 elif [[ $nodisplaylocation = true ]]; then
-  curl -s http://wttr.in/$city 2> /dev/null | awk -v xt=33 '{if(NR>xt) print a[NR%xt]; a[NR%xt]=$0}' | awk -v xh=1 'NR>xh{print $0}'
+  fmt_wttr 1 33
   echo ""
 else
   curl -s http://wttr.in/ 2> /dev/null | awk -v xt=33 '{if(NR>xt) print a[NR%xt]; a[NR%xt]=$0}'
