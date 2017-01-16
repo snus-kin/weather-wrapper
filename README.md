@@ -14,6 +14,7 @@ Options:
 Without any options, display today's simple forecast for your default location  
 
 # TODO
-- [ ] read defaults from config file including default city
-- [ ] make only one curl request when combining -0, -1, -2
+- [x] read defaults from config file including default city
+  - [ ] expand to work with more options  
+- [x] make only one curl request when combining -0, -1, -2
 - [ ] weather and moon should probably be permitted together, outputs concatenated
