@@ -91,10 +91,11 @@ fi
 # In awk processes below, xt and xh are lines to exclude from the head and tail of curl output, respectively
 # Should be slightly more portable than using head and tail
 # To extract tail, awk builds a buffer and begins printing it only after NR>xt e.g. a[1] is printed when a[xt] is being recorded
+weather_data=$(curl -s http://wttr.in/$city 2> /dev/null)
 
 function fmt_wttr {
   # $1=xh, $2=xt e.g. to exclude 3 lines from head and 5 from tail: fmt_wttr 3 5
-  curl -s http://wttr.in/$city 2> /dev/null | awk -v xt=$2 '{if(NR>xt) print a[NR%xt]; a[NR%xt]=$0}' | awk -v xh=$1 'NR>xh{print $0}'
+  echo "$weather_data" | awk -v xt=$2 '{if(NR>xt) print a[NR%xt]; a[NR%xt]=$0}' | awk -v xh=$1 'NR>xh{print $0}'
 }
 
 function fmt_moon {
