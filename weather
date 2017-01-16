@@ -95,7 +95,7 @@ weather_data=$(curl -s http://wttr.in/$city 2> /dev/null)
 
 function fmt_wttr {
   # $1=xh, $2=xt e.g. to exclude 3 lines from head and 5 from tail: fmt_wttr 3 5
-  echo "$weather_data" | awk -v xt=$2 '{if(NR>xt) print a[NR%xt]; a[NR%xt]=$0}' | awk -v xh=$1 'NR>xh{print $0}'
+  echo "$weather_data" | awk -v xt=$2 -v len=$3 '{if(NR>xt) print a[NR%xt]; a[NR%xt]=$0; i++; if (i>len) exit}' | awk -v xh=$1 'NR>xh{print $0}'
 }
 
 function fmt_moon {
@@ -103,21 +103,21 @@ function fmt_moon {
 }
 
 if  [[ $three = true ]]; then
-  fmt_wttr 0 2
+  fmt_wttr 0 2 39
 elif [[ $today || $tomorrow || $nextday = true ]]; then
   if [[ $today = true ]]; then
-    fmt_wttr 7 23
+    fmt_wttr 7 23 39
   fi
   if [[ $tomorrow = true ]]; then
-    fmt_wttr 17 13
+    fmt_wttr 17 13 39
   fi
   if [[ $nextday = true ]]; then
-    fmt_wttr 27 3
+    fmt_wttr 27 3 39
   fi
 elif [[ $moon = true ]]; then
   fmt_moon
 elif [[ $nodisplaylocation = true ]]; then
-  fmt_wttr 1 33
+  fmt_wttr 1 33 39
   echo ""
 else
   curl -s http://wttr.in/$city 2> /dev/null | awk -v xt=33 '{if(NR>xt) print a[NR%xt]; a[NR%xt]=$0}'
