@@ -13,6 +13,12 @@ Options:
   -m, --moon:      Show the moon phase (location agnostic)  
 Without any options, display today's simple forecast for your default location  
 
+# Why a Wrapper?
+Firstly, if you're looking for a self-hosted all singing all dancing program that does this: <https://github.com/schachmat/wego> is a good option, however it requires go and an api key, this program is more portable, only requiring curl.
+(for moon phase output use <https://github.com/chubin/pyphoon>)
+
+Also, before this I had never programmed anything in bash so it was a bit of a challenge.
+
 # TODO
 - [x] read defaults from config file including default city
   - [ ] expand to work with more options  
